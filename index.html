@@ -20,8 +20,6 @@
 
 html, body {
     width: 100%;
-    height: 100%;
-    overflow: hidden;
     font-family: Arial, sans-serif;
     background: #080d25;
 }
@@ -33,7 +31,7 @@ html, body {
 #loadingScreen {
     position: fixed;
     inset: 0;
-    z-index: 10;
+    z-index: 100;
 
     display: flex;
     flex-direction: column;
@@ -217,17 +215,35 @@ html, body {
 }
 
 /* =========================
-   ГЛАВНЫЙ ЭКРАН + СЛАЙДЫ
+   ГЛАВНЫЙ ЭКРАН (СКРОЛЛ)
 ========================= */
 
+/* mainScreen больше не fixed на весь экран,
+   а обычная страница, которая скроллится вниз.
+   scroll-snap делает так, что разделы «прилипают» к экрану —
+   как на классических лендингах. */
+
 #mainScreen {
-    position: fixed;
-    inset: 0;
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+
     background: #080d25;
-    overflow: hidden;
+
     opacity: 0;
     visibility: hidden;
     transition: opacity 1.2s ease, visibility 1.2s ease;
+
+    /* скрываем скроллбар для чистого вида (по желанию) */
+    scrollbar-width: none;
+}
+#mainScreen::-webkit-scrollbar {
+    display: none;
 }
 
 #mainScreen.show {
@@ -235,44 +251,61 @@ html, body {
     visibility: visible;
 }
 
-/* Слайды: оба фото лежат друг над другом.
-   Второй слайд в DOM выше, поэтому перекрывает первый.
-   Сначала он за экраном справа (translateX(100%)), потом выезжает на 0
-   — получается эффект «пролистывания» страницы влево. */
+/* Каждый экран — на всю высоту видимой области */
+.section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    overflow: hidden;
+}
 
-.slide {
-    position: absolute;
-    inset: 0;
+.section img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
-    display: block;
-
-    will-change: transform;
-    transition: transform 1.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+    user-select: none;
+    -webkit-user-drag: none;
 }
 
-/* Первое фото — стоит на месте */
-#firstImage {
-    transform: translateX(0);
-    z-index: 1;
+/* =========================
+   МЯГКИЙ ХИНТ «ЛИСТАЙ ВНИЗ»
+========================= */
+
+.scroll-hint {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+
+    color: rgba(255,255,255,0.85);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+
+    pointer-events: none;
+    animation: hintFloat 2s ease-in-out infinite;
 }
 
-/* Второе фото — изначально за правым краем экрана */
-#secondImage {
-    transform: translateX(100%);
-    z-index: 2;
+.scroll-hint .arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 2px solid rgba(255,255,255,0.85);
+    border-bottom: 2px solid rgba(255,255,255,0.85);
+    transform: rotate(45deg);
 }
 
-/* Когда добавляем .active — второе фото выезжает слева направо поверх первого,
-   а первое чуть уезжает влево (создаёт ощущение «прокрутки») */
-#mainScreen.secondActive #secondImage {
-    transform: translateX(0);
-}
-
-#mainScreen.secondActive #firstImage {
-    transform: translateX(-25%);
+@keyframes hintFloat {
+    0%, 100% { transform: translate(-50%, 0); }
+    50%      { transform: translate(-50%, 8px); }
 }
 
 /* =========================
@@ -303,6 +336,11 @@ html, body {
     .loading-bottom {
         bottom: 13%;
     }
+    .scroll-hint {
+        bottom: 20px;
+        font-size: 10px;
+        letter-spacing: 2px;
+    }
 }
 
 /* =========================
@@ -312,11 +350,9 @@ html, body {
 @media (prefers-reduced-motion: reduce) {
     .logo-wrapper,
     .logo-wrapper img,
-    .star {
+    .star,
+    .scroll-hint {
         animation: none;
-    }
-    .slide {
-        transition: none;
     }
 }
 
@@ -376,26 +412,31 @@ html, body {
 
 
 <!-- =========================
-     ГЛАВНЫЙ ЭКРАН
+     ГЛАВНЫЙ ЭКРАН (СКРОЛЛ)
 ========================= -->
 
 <div id="mainScreen">
 
-    <!-- ПЕРВОЕ ИЗОБРАЖЕНИЕ -->
-    <img
-        class="slide"
-        id="firstImage"
-        src="Изображение.jpeg"
-        alt="Первый экран свадебного приглашения"
-    >
+    <!-- ЭКРАН 1 -->
+    <section class="section" id="screen1">
+        <img
+            src="Изображение.jpeg"
+            alt="Первый экран свадебного приглашения"
+        >
 
-    <!-- ВТОРОЕ ИЗОБРАЖЕНИЕ (с пробелом в имени) -->
-    <img
-        class="slide"
-        id="secondImage"
-        src="Изображение 2.jpeg"
-        alt="Второй экран свадебного приглашения"
-    >
+        <div class="scroll-hint">
+            <span>Листай вниз</span>
+            <div class="arrow"></div>
+        </div>
+    </section>
+
+    <!-- ЭКРАН 2 -->
+    <section class="section" id="screen2">
+        <img
+            src="Изображение 2.jpeg"
+            alt="Второй экран свадебного приглашения"
+        >
+    </section>
 
 </div>
 
@@ -433,17 +474,9 @@ const progressBar   = document.getElementById("progressBar");
 const percent       = document.getElementById("percent");
 const loadingScreen = document.getElementById("loadingScreen");
 const mainScreen    = document.getElementById("mainScreen");
-const firstImage    = document.getElementById("firstImage");
-const secondImage   = document.getElementById("secondImage");
 
-
-/* =========================
-   НАСТРОЙКИ
-========================= */
-
-// Сколько миллисекунд показывать первое фото до «пролистывания»
-// 3000 = 3 секунды. Поставь 5000 для 5 секунд и т.д.
-const firstImageDuration = 3000;
+const screen1Img = document.querySelector("#screen1 img");
+const screen2Img = document.querySelector("#screen2 img");
 
 
 /* =========================
@@ -468,29 +501,26 @@ function preloadImage(image) {
 
 async function startWeddingWebsite() {
 
-    const ok1 = await preloadImage(firstImage);
-    const ok2 = await preloadImage(secondImage);
+    const ok1 = await preloadImage(screen1Img);
+    const ok2 = await preloadImage(screen2Img);
 
-    console.log("Фото 1 загружено:", ok1, "|", firstImage.src);
-    console.log("Фото 2 загружено:", ok2, "|", secondImage.src);
+    console.log("Фото 1 загружено:", ok1, "|", screen1Img.src);
+    console.log("Фото 2 загружено:", ok2, "|", screen2Img.src);
 
     if (!ok1) {
-        console.error("❗ Не загрузилось фото 1. Проверь путь/имя:", firstImage.src);
+        console.error("❗ Не загрузилось фото 1. Проверь путь/имя:", screen1Img.src);
     }
     if (!ok2) {
-        console.error("❗ Не загрузилось фото 2. Проверь путь/имя:", secondImage.src);
+        console.error("❗ Не загрузилось фото 2. Проверь путь/имя:", screen2Img.src);
         console.error("   Возможные причины: пробел в имени, кириллица, .jpg vs .jpeg vs .png.");
     }
 
-    // Прячем загрузку, показываем главный экран (первое фото уже на месте)
+    // Прячем загрузку и показываем скроллящуюся страницу
     loadingScreen.classList.add("hide");
     mainScreen.classList.add("show");
 
-    // Через firstImageDuration второе фото «пролистывается» поверх первого
-    setTimeout(() => {
-        mainScreen.classList.add("secondActive");
-        console.log("Пролистываем на второе фото");
-    }, 500 + firstImageDuration);
+    // Сбрасываем скролл в начало — на фото 1
+    mainScreen.scrollTop = 0;
 }
 
 
