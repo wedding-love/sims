@@ -255,50 +255,6 @@ html, body {
 }
 
 /* =========================
-   МЯГКИЙ ХИНТ «ЛИСТАЙ ВНИЗ»
-========================= */
-
-.scroll-hint {
-    position: fixed;
-    bottom: 28px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 5;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-
-    color: rgba(255,255,255,0.85);
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-
-    pointer-events: none;
-    animation: hintFloat 2s ease-in-out infinite;
-
-    transition: opacity 0.6s ease;
-}
-
-.scroll-hint.hidden {
-    opacity: 0;
-}
-
-.scroll-hint .arrow {
-    width: 20px;
-    height: 20px;
-    border-right: 2px solid rgba(255,255,255,0.85);
-    border-bottom: 2px solid rgba(255,255,255,0.85);
-    transform: rotate(45deg);
-}
-
-@keyframes hintFloat {
-    0%, 100% { transform: translate(-50%, 0); }
-    50%      { transform: translate(-50%, 8px); }
-}
-
-/* =========================
    МОБИЛЬНАЯ АДАПТАЦИЯ
 ========================= */
 
@@ -326,11 +282,6 @@ html, body {
     .loading-bottom {
         bottom: 13%;
     }
-    .scroll-hint {
-        bottom: 20px;
-        font-size: 10px;
-        letter-spacing: 2px;
-    }
 }
 
 /* =========================
@@ -340,8 +291,7 @@ html, body {
 @media (prefers-reduced-motion: reduce) {
     .logo-wrapper,
     .logo-wrapper img,
-    .star,
-    .scroll-hint {
+    .star {
         animation: none;
     }
 }
@@ -410,16 +360,10 @@ html, body {
     <img
         class="long-image"
         id="longImage"
-        src="Изображение 3.jpeg"
+        src="Изображение 4.jpeg"
         alt="Свадебное приглашение"
     >
 
-</div>
-
-<!-- Подсказка «листай вниз» (исчезает после первого скролла) -->
-<div class="scroll-hint" id="scrollHint">
-    <span>Листай вниз</span>
-    <div class="arrow"></div>
 </div>
 
 
@@ -457,7 +401,6 @@ const percent       = document.getElementById("percent");
 const loadingScreen = document.getElementById("loadingScreen");
 const mainScreen    = document.getElementById("mainScreen");
 const longImage     = document.getElementById("longImage");
-const scrollHint    = document.getElementById("scrollHint");
 
 
 /* =========================
@@ -498,24 +441,6 @@ async function startWeddingWebsite() {
     // Скроллим в самое начало
     window.scrollTo(0, 0);
 }
-
-
-/* =========================
-   СКРЫТИЕ ПОДСКАЗКИ ПРИ СКРОЛЛЕ
-========================= */
-
-let hintHidden = false;
-
-function handleScroll() {
-    if (hintHidden) return;
-
-    if (window.scrollY > 40) {
-        scrollHint.classList.add("hidden");
-        hintHidden = true;
-    }
-}
-
-window.addEventListener("scroll", handleScroll, { passive: true });
 
 
 /* =========================
