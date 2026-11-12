@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -77,20 +76,12 @@ html, body {
     background: white;
     border-radius: 50%;
     box-shadow: 0 0 8px white;
-
     animation: twinkle 2s infinite alternate;
 }
 
 @keyframes twinkle {
-    from {
-        opacity: 0.2;
-        transform: scale(0.7);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1.3);
-    }
+    from { opacity: 0.2; transform: scale(0.7); }
+    to   { opacity: 1;   transform: scale(1.3); }
 }
 
 /* =========================
@@ -100,71 +91,38 @@ html, body {
 .logo-wrapper {
     width: 145px;
     height: 145px;
-
     margin-bottom: 35px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     perspective: 650px;
     perspective-origin: center;
-
     animation: float3D 3s ease-in-out infinite;
 }
 
 .logo-wrapper img {
     width: 100%;
     height: 100%;
-
     object-fit: contain;
-
     transform-style: preserve-3d;
-
     filter:
         drop-shadow(0 0 8px rgba(100,255,130,0.8))
         drop-shadow(0 0 20px rgba(50,220,100,0.5))
         drop-shadow(0 0 35px rgba(50,220,100,0.25));
-
     animation: spin3D 4s linear infinite;
 }
 
-/* Вращение */
-
 @keyframes spin3D {
-
-    0% {
-        transform: rotateY(0deg) rotateX(8deg);
-    }
-
-    25% {
-        transform: rotateY(90deg) rotateX(0deg);
-    }
-
-    50% {
-        transform: rotateY(180deg) rotateX(-8deg);
-    }
-
-    75% {
-        transform: rotateY(270deg) rotateX(0deg);
-    }
-
-    100% {
-        transform: rotateY(360deg) rotateX(8deg);
-    }
+    0%   { transform: rotateY(0deg)   rotateX(8deg);  }
+    25%  { transform: rotateY(90deg)  rotateX(0deg);  }
+    50%  { transform: rotateY(180deg) rotateX(-8deg); }
+    75%  { transform: rotateY(270deg) rotateX(0deg);  }
+    100% { transform: rotateY(360deg) rotateX(8deg);  }
 }
 
-/* Парение */
-
 @keyframes float3D {
-
-    0%, 100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-12px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-12px); }
 }
 
 /* =========================
@@ -173,24 +131,18 @@ html, body {
 
 .game-title {
     color: white;
-
     font-size: clamp(27px, 5vw, 45px);
     font-weight: 800;
-
     letter-spacing: 3px;
     text-align: center;
-
     text-shadow: 0 3px 15px rgba(0,0,0,0.5);
 }
 
 .game-subtitle {
     color: #c7d8f5;
-
     font-size: 13px;
     letter-spacing: 4px;
-
     margin-top: 12px;
-
     text-transform: uppercase;
     text-align: center;
 }
@@ -201,23 +153,18 @@ html, body {
 
 .wedding-text {
     color: #ffffff;
-
     font-size: 17px;
     font-weight: 400;
-
     letter-spacing: 1px;
     text-align: center;
-
     margin-top: 38px;
     padding: 0 20px;
 }
 
 .wedding-caption {
     color: #b9c8e7;
-
     font-size: 12px;
     letter-spacing: 2px;
-
     margin-top: 12px;
     text-align: center;
 }
@@ -229,63 +176,43 @@ html, body {
 .loading-bottom {
     position: absolute;
     bottom: 12%;
-
     width: min(320px, 75%);
-
     text-align: center;
 }
 
 .loading-text {
     color: white;
-
     font-size: 13px;
     letter-spacing: 3px;
-
     margin-bottom: 15px;
-
     animation: blink 1.3s infinite;
 }
 
 @keyframes blink {
-    50% {
-        opacity: 0.4;
-    }
+    50% { opacity: 0.4; }
 }
 
 .progress-track {
     height: 7px;
-
     background: rgba(255,255,255,0.18);
-
     border-radius: 20px;
     overflow: hidden;
-
     border: 1px solid rgba(255,255,255,0.25);
 }
 
 .progress-bar {
     height: 100%;
     width: 0%;
-
     border-radius: 20px;
-
-    background: linear-gradient(
-        90deg,
-        #48d66e,
-        #b8ff9c
-    );
-
+    background: linear-gradient(90deg, #48d66e, #b8ff9c);
     box-shadow: 0 0 12px #5aff80;
-
     transition: width 0.15s linear;
 }
 
 .loading-percent {
     color: rgba(255,255,255,0.7);
-
     font-size: 11px;
     margin-top: 10px;
-
     letter-spacing: 2px;
 }
 
@@ -296,13 +223,10 @@ html, body {
 #mainScreen {
     position: fixed;
     inset: 0;
-
-    background: #111;
-
+    background: #080d25;
     opacity: 0;
     visibility: hidden;
-
-    transition: opacity 1.5s ease;
+    transition: opacity 1.5s ease, visibility 1.5s ease;
 }
 
 #mainScreen.show {
@@ -310,68 +234,54 @@ html, body {
     visibility: visible;
 }
 
-/* Изображения друг над другом */
+/* Изображения друг над другом.
+   Второй слайд в DOM позже — значит всегда выше первого.
+   Пока opacity второго = 0, видно первый.
+   Когда второй получает .active — он плавно проявляется и перекрывает первый. */
 
 .slide {
     position: absolute;
     inset: 0;
-
     width: 100%;
     height: 100%;
-
     object-fit: cover;
     object-position: center;
-
     display: block;
-
     opacity: 0;
-
     transition: opacity 1.5s ease;
 }
-
-/* Первое изображение */
 
 .slide.active {
     opacity: 1;
 }
 
-/* Второе изображение */
-
-.slide.next {
-    opacity: 0;
-}
+/* ❗️ УДАЛЕНО правило .slide.next — именно оно ломало показ второго фото */
 
 /* =========================
    МОБИЛЬНАЯ АДАПТАЦИЯ
 ========================= */
 
 @media (max-width: 600px) {
-
     .logo-wrapper {
         width: 115px;
         height: 115px;
         margin-bottom: 30px;
     }
-
     .game-title {
         font-size: 29px;
         letter-spacing: 2px;
     }
-
     .game-subtitle {
         font-size: 11px;
         letter-spacing: 3px;
     }
-
     .wedding-text {
         font-size: 15px;
         line-height: 1.5;
     }
-
     .wedding-caption {
         font-size: 11px;
     }
-
     .loading-bottom {
         bottom: 13%;
     }
@@ -382,13 +292,11 @@ html, body {
 ========================= */
 
 @media (prefers-reduced-motion: reduce) {
-
     .logo-wrapper,
     .logo-wrapper img,
     .star {
         animation: none;
     }
-
 }
 
 </style>
@@ -404,18 +312,12 @@ html, body {
 
     <div class="stars" id="stars"></div>
 
-    <!-- 3D ЗНАЧОК -->
-
     <div class="logo-wrapper">
-
         <img
             src="Изображение_1-removebg-preview-2.png"
             alt="Wedding Symbol"
         >
-
     </div>
-
-    <!-- НАЗВАНИЕ -->
 
     <div class="game-title">
         THE SIMS 4
@@ -425,8 +327,6 @@ html, body {
         Wedding Edition
     </div>
 
-    <!-- СВАДЕБНЫЙ ТЕКСТ -->
-
     <div class="wedding-text">
         Готовим самый счастливый день…
     </div>
@@ -435,8 +335,6 @@ html, body {
         История любви начинается
     </div>
 
-    <!-- ПОЛОСА ЗАГРУЗКИ -->
-
     <div class="loading-bottom">
 
         <div class="loading-text">
@@ -444,12 +342,7 @@ html, body {
         </div>
 
         <div class="progress-track">
-
-            <div
-                class="progress-bar"
-                id="progressBar">
-            </div>
-
+            <div class="progress-bar" id="progressBar"></div>
         </div>
 
         <div class="loading-percent" id="percent">
@@ -467,8 +360,7 @@ html, body {
 
 <div id="mainScreen">
 
-    <!-- ПЕРВОЕ ИЗОБРАЖЕНИЕ -->
-
+    <!-- ПЕРВОЕ ИЗОБРАЖЕНИЕ (класс .next больше не нужен) -->
     <img
         class="slide active"
         id="firstImage"
@@ -477,9 +369,8 @@ html, body {
     >
 
     <!-- ВТОРОЕ ИЗОБРАЖЕНИЕ -->
-
     <img
-        class="slide next"
+        class="slide"
         id="secondImage"
         src="Изображение2.jpeg"
         alt="Второй экран свадебного приглашения"
@@ -488,40 +379,25 @@ html, body {
 </div>
 
 
-<!-- =========================
-     JAVASCRIPT
-========================= -->
-
 <script>
 
 /* =========================
    СОЗДАНИЕ ЗВЁЗД
 ========================= */
 
-const starsContainer =
-    document.getElementById("stars");
+const starsContainer = document.getElementById("stars");
 
 for (let i = 0; i < 110; i++) {
-
     const star = document.createElement("div");
-
     star.className = "star";
 
-    star.style.left =
-        Math.random() * 100 + "%";
-
-    star.style.top =
-        Math.random() * 100 + "%";
-
-    star.style.animationDelay =
-        Math.random() * 3 + "s";
-
-    star.style.animationDuration =
-        (1 + Math.random() * 3) + "s";
+    star.style.left = Math.random() * 100 + "%";
+    star.style.top  = Math.random() * 100 + "%";
+    star.style.animationDelay    = Math.random() * 3 + "s";
+    star.style.animationDuration = (1 + Math.random() * 3) + "s";
 
     const size = 1 + Math.random() * 3;
-
-    star.style.width = size + "px";
+    star.style.width  = size + "px";
     star.style.height = size + "px";
 
     starsContainer.appendChild(star);
@@ -532,89 +408,59 @@ for (let i = 0; i < 110; i++) {
    ЭЛЕМЕНТЫ
 ========================= */
 
-const progressBar =
-    document.getElementById("progressBar");
-
-const percent =
-    document.getElementById("percent");
-
-const loadingScreen =
-    document.getElementById("loadingScreen");
-
-const mainScreen =
-    document.getElementById("mainScreen");
-
-const firstImage =
-    document.getElementById("firstImage");
-
-const secondImage =
-    document.getElementById("secondImage");
+const progressBar   = document.getElementById("progressBar");
+const percent       = document.getElementById("percent");
+const loadingScreen = document.getElementById("loadingScreen");
+const mainScreen    = document.getElementById("mainScreen");
+const firstImage    = document.getElementById("firstImage");
+const secondImage   = document.getElementById("secondImage");
 
 
 /* =========================
    НАСТРОЙКИ
 ========================= */
 
-// Время показа первого изображения
-// 5000 = 5 секунд
-
+// Сколько миллисекунд показывать первое фото (5000 = 5 сек)
 const firstImageDuration = 5000;
 
 
 /* =========================
-   ПРОВЕРКА ЗАГРУЗКИ ФОТО
+   ПРЕДЗАГРУЗКА ИЗОБРАЖЕНИЙ
 ========================= */
 
 function preloadImage(image) {
-
     return new Promise((resolve) => {
-
         if (image.complete && image.naturalWidth > 0) {
             resolve(true);
             return;
         }
-
-        image.onload = () => resolve(true);
+        image.onload  = () => resolve(true);
         image.onerror = () => resolve(false);
-
     });
-
 }
 
 
 /* =========================
-   ПЕРЕКЛЮЧЕНИЕ ИЗОБРАЖЕНИЙ
+   ЗАПУСК САЙТА
 ========================= */
 
 async function startWeddingWebsite() {
 
-    // Ждём загрузки обоих изображений
-
+    // Ждём загрузки обоих фото
     await Promise.all([
         preloadImage(firstImage),
         preloadImage(secondImage)
     ]);
 
-    // Показываем главный экран
-
+    // Прячем загрузку и показываем главный экран одновременно,
+    // чтобы не было «пустого» мерцания между экранами
     loadingScreen.classList.add("hide");
+    mainScreen.classList.add("show");
 
+    // Через N мс плавно проявляем второй экран поверх первого
     setTimeout(() => {
-
-        mainScreen.classList.add("show");
-
-    }, 500);
-
-    // Через 5 секунд открываем второе фото
-
-    setTimeout(() => {
-
-        firstImage.classList.remove("active");
-
         secondImage.classList.add("active");
-
     }, 500 + firstImageDuration);
-
 }
 
 
@@ -629,27 +475,20 @@ const loadingInterval = setInterval(() => {
     progress += Math.random() * 3 + 1;
 
     if (progress >= 100) {
-
         progress = 100;
-
         clearInterval(loadingInterval);
-
         progressBar.style.width = "100%";
         percent.textContent = "100%";
 
         setTimeout(() => {
-
             startWeddingWebsite();
-
         }, 700);
 
+        return;
     }
 
-    progressBar.style.width =
-        progress + "%";
-
-    percent.textContent =
-        Math.floor(progress) + "%";
+    progressBar.style.width = progress + "%";
+    percent.textContent = Math.floor(progress) + "%";
 
 }, 100);
 
