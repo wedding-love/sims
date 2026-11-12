@@ -215,23 +215,17 @@ html, body {
 }
 
 /* =========================
-   ГЛАВНЫЙ ЭКРАН (СКРОЛЛ)
+   ГЛАВНЫЙ ЭКРАН (ОДНО ДЛИННОЕ ФОТО)
 ========================= */
 
-/* mainScreen больше не fixed на весь экран,
-   а обычная страница, которая скроллится вниз.
-   scroll-snap делает так, что разделы «прилипают» к экрану —
-   как на классических лендингах. */
+/* Одна страница. Картинка идёт сверху вниз на всю свою высоту,
+   ширина = 100% экрана, высота = auto (по пропорциям).
+   Страница скроллится, пока пользователь проходит по всей картинке. */
 
 #mainScreen {
     position: relative;
     width: 100%;
-    height: 100vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    scroll-snap-type: y mandatory;
-    scroll-behavior: smooth;
+    min-height: 100vh;
 
     background: #080d25;
 
@@ -251,22 +245,11 @@ html, body {
     visibility: visible;
 }
 
-/* Каждый экран — на всю высоту видимой области */
-.section {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-    overflow: hidden;
-}
-
-.section img {
+/* Само длинное изображение */
+.long-image {
     display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+    height: auto;            /* ← ключевое: высота по пропорциям, не растягиваем */
     user-select: none;
     -webkit-user-drag: none;
 }
@@ -276,10 +259,11 @@ html, body {
 ========================= */
 
 .scroll-hint {
-    position: absolute;
+    position: fixed;
     bottom: 28px;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 5;
 
     display: flex;
     flex-direction: column;
@@ -293,6 +277,12 @@ html, body {
 
     pointer-events: none;
     animation: hintFloat 2s ease-in-out infinite;
+
+    transition: opacity 0.6s ease;
+}
+
+.scroll-hint.hidden {
+    opacity: 0;
 }
 
 .scroll-hint .arrow {
@@ -412,32 +402,24 @@ html, body {
 
 
 <!-- =========================
-     ГЛАВНЫЙ ЭКРАН (СКРОЛЛ)
+     ГЛАВНЫЙ ЭКРАН — ОДНО ДЛИННОЕ ФОТО
 ========================= -->
 
 <div id="mainScreen">
 
-    <!-- ЭКРАН 1 -->
-    <section class="section" id="screen1">
-        <img
-            src="Изображение.jpeg"
-            alt="Первый экран свадебного приглашения"
-        >
+    <img
+        class="long-image"
+        id="longImage"
+        src="Изображение 3.jpeg"
+        alt="Свадебное приглашение"
+    >
 
-        <div class="scroll-hint">
-            <span>Листай вниз</span>
-            <div class="arrow"></div>
-        </div>
-    </section>
+</div>
 
-    <!-- ЭКРАН 2 -->
-    <section class="section" id="screen2">
-        <img
-            src="Изображение 2.jpeg"
-            alt="Второй экран свадебного приглашения"
-        >
-    </section>
-
+<!-- Подсказка «листай вниз» (исчезает после первого скролла) -->
+<div class="scroll-hint" id="scrollHint">
+    <span>Листай вниз</span>
+    <div class="arrow"></div>
 </div>
 
 
@@ -474,13 +456,12 @@ const progressBar   = document.getElementById("progressBar");
 const percent       = document.getElementById("percent");
 const loadingScreen = document.getElementById("loadingScreen");
 const mainScreen    = document.getElementById("mainScreen");
-
-const screen1Img = document.querySelector("#screen1 img");
-const screen2Img = document.querySelector("#screen2 img");
+const longImage     = document.getElementById("longImage");
+const scrollHint    = document.getElementById("scrollHint");
 
 
 /* =========================
-   ПРЕДЗАГРУЗКА ИЗОБРАЖЕНИЙ
+   ПРЕДЗАГРУЗКА ИЗОБРАЖЕНИЯ
 ========================= */
 
 function preloadImage(image) {
@@ -501,27 +482,40 @@ function preloadImage(image) {
 
 async function startWeddingWebsite() {
 
-    const ok1 = await preloadImage(screen1Img);
-    const ok2 = await preloadImage(screen2Img);
+    const ok = await preloadImage(longImage);
 
-    console.log("Фото 1 загружено:", ok1, "|", screen1Img.src);
-    console.log("Фото 2 загружено:", ok2, "|", screen2Img.src);
+    console.log("Длинное фото загружено:", ok, "|", longImage.src);
 
-    if (!ok1) {
-        console.error("❗ Не загрузилось фото 1. Проверь путь/имя:", screen1Img.src);
-    }
-    if (!ok2) {
-        console.error("❗ Не загрузилось фото 2. Проверь путь/имя:", screen2Img.src);
+    if (!ok) {
+        console.error("❗ Не загрузилось длинное фото. Проверь путь/имя:", longImage.src);
         console.error("   Возможные причины: пробел в имени, кириллица, .jpg vs .jpeg vs .png.");
     }
 
-    // Прячем загрузку и показываем скроллящуюся страницу
+    // Прячем загрузку и показываем страницу
     loadingScreen.classList.add("hide");
     mainScreen.classList.add("show");
 
-    // Сбрасываем скролл в начало — на фото 1
-    mainScreen.scrollTop = 0;
+    // Скроллим в самое начало
+    window.scrollTo(0, 0);
 }
+
+
+/* =========================
+   СКРЫТИЕ ПОДСКАЗКИ ПРИ СКРОЛЛЕ
+========================= */
+
+let hintHidden = false;
+
+function handleScroll() {
+    if (hintHidden) return;
+
+    if (window.scrollY > 40) {
+        scrollHint.classList.add("hidden");
+        hintHidden = true;
+    }
+}
+
+window.addEventListener("scroll", handleScroll, { passive: true });
 
 
 /* =========================
